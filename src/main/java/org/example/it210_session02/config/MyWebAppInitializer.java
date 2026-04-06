@@ -11,13 +11,11 @@ public class MyWebAppInitializer extends AbstractAnnotationConfigDispatcherServl
 
     @Override
     protected Class<?>[] getServletConfigClasses() {
-        // Đăng ký file cấu hình WebConfig
         return new Class<?>[] { WebConfig.class };
     }
 
     @Override
     protected String[] getServletMappings() {
-        // ĐÃ SỬA: "/" giúp DispatcherServlet nhận toàn bộ URL
         return new String[] { "/" };
     }
 }

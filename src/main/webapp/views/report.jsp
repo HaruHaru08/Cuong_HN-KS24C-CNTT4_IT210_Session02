@@ -1,55 +1,75 @@
-<%--
-  Created by IntelliJ IDEA.
-  User: ACER
-  Date: 06/04/2026
-  Time: 9:08 CH
-  To change this template use File | Settings | File Templates.
---%>
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java"
+         import="java.util.List, org.example.it210_session02.controller.ReportController.Student" %>
+
+<%!
+  // Biến đếm toàn cục (Thread-safe if used carefully)
+  private int requestCounter = 0;
+%>
+
 <html>
 <head>
-    <title>Title</title>
+  <title>Báo cáo điểm</title>
 </head>
 <body>
-<h2>Báo cáo của sinh viên: <c:out value="${param.user}" default="Khách" /></h2>
+
+<%
+  synchronized (this) {
+    requestCounter++;
+  }
+  List<Student> list = (List<Student>) request.getAttribute("studentList");
+  String title = (String) request.getAttribute("reportTitle");
+%>
+
+<h1><%= (title != null) ? title : "Báo cáo" %></h1>
+<p>Lượt xem trang: <%= requestCounter %></p>
 
 <table border="1">
   <thead>
   <tr>
     <th>STT</th>
-    <th>Tên môn học</th>
-    <th>Điểm số</th>
-    <th>Trạng thái</th>
+    <th>Họ tên</th>
+    <th>Điểm</th>
+    <th>Xếp loại</th>
   </tr>
   </thead>
   <tbody>
-  <%-- 2. Dùng c:forEach thay cho vòng lặp for của Java --%>
-  <c:forEach var="item" items="${studentReport.items}" varStatus="status">
-    <tr>
-      <td>${status.index + 1}</td>
-      <td><c:out value="${item.subjectName}" /></td>
-      <td>${item.score}</td>
-
-        <%-- 3. Dùng c:choose thay cho if-else lộn xộn --%>
-      <td>
-        <c:choose>
-          <c:when test="${item.score >= 5}">
-            <span style="color: green;">Đạt</span>
-          </c:when>
-          <c:otherwise>
-            <span style="color: red;">Không đạt</span>
-          </c:otherwise>
-        </c:choose>
-      </td>
-    </tr>
-  </c:forEach>
+  <%
+    if (list != null) {
+      for (int i = 0; i < list.size(); i++) {
+        Student sv = list.get(i);
+        String rank;
+        if (sv.getScore() >= 90) {
+          rank = "Xuất sắc";
+        } else if (sv.getScore() >= 80) {
+          rank = "Giỏi";
+        } else if (sv.getScore() >= 70) {
+          rank = "Khá";
+        } else if (sv.getScore() >= 60) {
+          rank = "Trung bình khá";
+        } else if (sv.getScore() >= 50) {
+          rank = "Trung bình";
+        } else {
+          rank = "Yếu";
+        }
+  %>
+  <tr>
+    <td><%= i + 1 %></td>
+    <td><%= sv.getFullName() %></td>
+    <td><%= sv.getScore() %></td>
+    <td><%= rank %></td>
+  </tr>
+  <%
+      }
+    } else {
+  %>
+  <tr>
+    <td colspan="4">Không có dữ liệu sinh viên.</td>
+  </tr>
+  <%
+    }
+  %>
   </tbody>
 </table>
 
-<p>Tổng kết:
-  <strong>
-    ${studentReport.averageScore >= 5 ? "Đủ điều kiện xét học bổng" : "Không đủ điều kiện"}
-  </strong>
-</p>
 </body>
 </html>
